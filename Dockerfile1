@@ -1,0 +1,16 @@
+FROM python:3.11-slim
+
+USER root
+RUN apt-get update && apt-get install -y gcc python3-dev
+
+RUN pip3 install torch transformers fastapi uvicorn
+
+# Download the model and tokenizer
+RUN python3 -c "from transformers import AutoModelForCausalLM, AutoTokenizer; AutoModelForCausalLM.from_pretrained('microsoft/DialoGPT-Medium'); AutoTokenizer.from_pretrained('microsoft/DialoGPT-Medium')"
+
+COPY src src
+
+WORKDIR /src
+EXPOSE 8000
+
+CMD ["uvicorn" , "main:app" , "--reload", "--host", "0.0.0.0", "--port", "8000"]

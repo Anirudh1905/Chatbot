@@ -1,0 +1,13 @@
+# Use an official Python runtime as a parent image
+FROM python:3.11-slim
+
+RUN pip3 install streamlit requests
+
+COPY src src
+WORKDIR /src
+
+# Expose the port that Streamlit will run on
+EXPOSE 8501
+
+# Run streamlit when the container launches
+CMD ["streamlit", "run", "frontend.py"]
