@@ -1,2 +1,2 @@
-# ray-llm
-Deploy LLM model using ray serve
+# TextBot
+Basic LLm model for sentence completion
