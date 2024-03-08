@@ -22,7 +22,7 @@ if prompt := st.chat_input("What is up?"):
         st.markdown(prompt)
 
     # Make an HTTP POST request to the endpoint
-    response = requests.post(f"http://chatbot.default.svc.cluster.local:8000/?prompt={prompt}")
+    response = requests.post(f"http://localhost:8000/?prompt={prompt}")
     response_text = response.json()["bot_response"]
 
     # Display assistant response in chat message container
