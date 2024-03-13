@@ -30,7 +30,8 @@ resource "aws_lb" "alb" {
   subnets         = [aws_subnet.public_subnet.id]
 
   tags = {
-    Name = "web"
+    "Name"   = "chatbot-alb"
+    "k8s.io/cluster-autoscaler/enabled" = "true"
   }
 }
 
