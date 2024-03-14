@@ -18,11 +18,11 @@ spec:
         - containerPort: 8501
         resources:
           requests:
-            memory: "1Gi"
-            cpu: "1"
+            memory: 500Mi
+            cpu: 250m
           limits:
-            memory: "1Gi"
-            cpu: "1"
+            memory: 500Mi
+            cpu: 250m
 
 ---
 apiVersion: v1
@@ -36,3 +36,23 @@ spec:
   - protocol: TCP
     port: 80
     targetPort: 8501
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: streamlit-ingress
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+        - path: /
+          pathType: Exact
+          backend:
+            service:
+              name: streamlit-service
+              port:
+                number: 80

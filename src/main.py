@@ -1,13 +1,15 @@
 from fastapi import FastAPI
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import logging
+import os
 
 logging.basicConfig(level=logging.DEBUG)
 
 app = FastAPI()
-MODEL_DIR = "/models"
-tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR)
-model = AutoModelForCausalLM.from_pretrained(MODEL_DIR)
+model_dir = os.environ.get("MODEL_DIR")
+
+tokenizer = AutoTokenizer.from_pretrained(model_dir)
+model = AutoModelForCausalLM.from_pretrained(model_dir)
 
 
 @app.post("/")

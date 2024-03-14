@@ -18,11 +18,11 @@ spec:
         - containerPort: 8000
         resources:
           requests:
-            memory: "2Gi"
-            cpu: "1"
+            memory: 2Gi
+            cpu: 1
           limits:
-            memory: "2Gi"
-            cpu: "1"
+            memory: 2Gi
+            cpu: 1
 
 ---
 apiVersion: v1
