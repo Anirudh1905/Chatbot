@@ -22,11 +22,11 @@ if prompt := st.chat_input("What is up?"):
         st.markdown(prompt)
 
     # Make an HTTP POST request to the endpoint
-    response = requests.post(f"http://localhost:8000/?prompt={prompt}")
+    response = requests.post(f"http://chatbot-service:80/?prompt={prompt}")
     response_text = response.json()["bot_response"]
 
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
         st.markdown(response_text)
-                
+
     st.session_state.messages.append({"role": "assistant", "content": response_text})

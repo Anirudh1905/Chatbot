@@ -5,12 +5,15 @@ RUN apt-get update && apt-get install -y gcc python3-dev
 
 RUN pip3 install torch transformers fastapi uvicorn
 
-# Download the model and tokenizer
-RUN python3 -c "from transformers import AutoModelForCausalLM, AutoTokenizer; AutoModelForCausalLM.from_pretrained('microsoft/DialoGPT-Medium'); AutoTokenizer.from_pretrained('microsoft/DialoGPT-Medium')"
-
 COPY src src
 
 WORKDIR /src
+
+# download and save the model in build time
+ENV MODEL_NAME="microsoft/DialoGPT-Medium"
+ENV MODEL_DIR="/models" 
+RUN python -c "from transformers import AutoTokenizer, AutoModelForCausalLM; tokenizer = AutoTokenizer.from_pretrained('$MODEL_NAME'); model = AutoModelForCausalLM.from_pretrained('$MODEL_NAME'); tokenizer.save_pretrained('$MODEL_DIR'); model.save_pretrained('$MODEL_DIR')"
+
 EXPOSE 8000
 
 CMD ["uvicorn" , "main:app" , "--reload", "--host", "0.0.0.0", "--port", "8000"]
