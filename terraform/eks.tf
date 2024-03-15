@@ -28,8 +28,10 @@ resource "aws_eks_cluster" "cluster" {
 
   vpc_config {
     subnet_ids = [
-      aws_subnet.public_subnet.id,
-      aws_subnet.private_subnet.id
+      aws_subnet.public-us-east-1a.id,
+      aws_subnet.public-us-east-1b.id,
+      aws_subnet.private-us-east-1a.id,
+      aws_subnet.private-us-east-1b.id
     ]
   }
 
@@ -73,7 +75,8 @@ resource "aws_eks_node_group" "private_nodes" {
 
   # Single subnet to avoid data transfer charges while testing.
   subnet_ids = [
-    aws_subnet.private_subnet.id
+    aws_subnet.private-us-east-1a.id,
+    aws_subnet.private-us-east-1b.id
   ]
 
   capacity_type  = "ON_DEMAND"
