@@ -2,10 +2,10 @@
 
 Basic LLM model for sentence completion
 
-## Low level Design
+## High Level Design
 
-![LLD](LLD/v4.0.png)
+![HLD](Designs/v4.0.png)
 
-## Kubernetes Architecture
+## Low Level Design
 
-![k8s](LLD/k8s-arch.png)
+![LLD](Designs/LLD.png)
