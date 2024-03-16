@@ -1,7 +1,6 @@
 name: Deploy to EKS
 
 on:
- 
   push:
     branches: [ main ]
 
@@ -12,14 +11,11 @@ env:
   AWS_REGION: us-east-1
 
 jobs:
-  
   build:
-    
     name: Deployment
     runs-on: ubuntu-latest
 
     steps:
-
     - name: Set short git commit SHA
       id: commit
       uses: prompt/actions-commit-hash@v2
@@ -88,5 +84,3 @@ jobs:
         else
           echo "Chatbot Deployment successful"
         fi
-
-    
