@@ -21,7 +21,6 @@ async def chatbot_endpoint(prompt: str):
 
     return {"bot_response": bot_response}
 
-
 # if __name__ == "__main__":
 #     import uvicorn
 #     logging.INFO("Starting Server")
