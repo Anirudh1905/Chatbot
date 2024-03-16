@@ -16,10 +16,10 @@ spec:
         image: server:latest
         resources:
           requests:
-            cpu: "200m"
+            cpu: "700m"
             memory: "2Gi"
           limits:
-            cpu: "500m"
+            cpu: "1"
             memory: "2Gi"
         ports:
         - containerPort: 8000

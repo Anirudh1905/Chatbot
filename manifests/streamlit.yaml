@@ -16,10 +16,10 @@ spec:
         image: streamlit:latest
         resources:
           requests:
-            cpu: "20m"
+            cpu: "200m"
             memory: "200Mi"
           limits:
-            cpu: "100m"
+            cpu: "500m"
             memory: "200Mi"
         ports:
         - containerPort: 8501
