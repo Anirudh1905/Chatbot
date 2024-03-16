@@ -15,6 +15,7 @@ model = AutoModelForCausalLM.from_pretrained(model_dir)
 @app.post("/")
 async def chatbot_endpoint(prompt: str):
     inputs = tokenizer([prompt], return_tensors="pt")
+    model.config.max_length = max(2*inputs.input_ids.size(1), 120)
     outputs = model.generate(**inputs)
     bot_response = tokenizer.decode(outputs[0], skip_special_tokens=True)
 

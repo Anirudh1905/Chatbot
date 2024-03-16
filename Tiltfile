@@ -8,7 +8,7 @@ helm_remote(
 )
 
 # Tilt will build the docker image in the root
-docker_build("chatbot", ".", dockerfile="Dockerfile-server")
+docker_build("server", ".", dockerfile="Dockerfile-server")
 docker_build("streamlit", ".", dockerfile="Dockerfile-frontend")
 
 k8s_yaml("manifests/chatbot.yaml")
