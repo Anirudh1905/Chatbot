@@ -17,10 +17,8 @@ spec:
         resources:
           requests:
             cpu: "700m"
-            memory: "2Gi"
           limits:
             cpu: "1"
-            memory: "2Gi"
         ports:
         - containerPort: 8000
 ---
