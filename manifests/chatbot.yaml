@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: chatbot
-        image: 446510550067.dkr.ecr.us-east-1.amazonaws.com/chatbot-repo/server:latest
+        image: server:latest
         ports:
         - containerPort: 8000
 ---
