@@ -1,13 +1,12 @@
-name: Deploy to EKS
+name: Deploy Server to EKS
 
 on:
   push:
     branches: [ main ]
-    # paths:
-    #   - 'src/**'
+    paths:
+      - 'src/main.py'
 
 env:
-  ECR_REPOSITORY_FRONTEND: chatbot-repo/streamlit
   ECR_REPOSITORY_SERVER: chatbot-repo/server
   EKS_CLUSTER_NAME: chatbot-cluster
   AWS_REGION: us-east-1
@@ -54,11 +53,9 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}   
         IMAGE_TAG: ${{ steps.commit.outputs.short }}
       run: |
-        docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_FRONTEND }}:${{ env.IMAGE_TAG }} -f Dockerfile-frontend . --cache-from=type=local,src=/tmp/.buildx-cache
-        docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_FRONTEND }}:${{ env.IMAGE_TAG }}
-        
         docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_SERVER }}:${{ env.IMAGE_TAG }} -f Dockerfile-server . --cache-from=type=local,src=/tmp/.buildx-cache
         docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_SERVER }}:${{ env.IMAGE_TAG }}
+        docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_SERVER }}:${{ env.IMAGE_TAG }} ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_SERVER }}:latest
 
     - name: Update kube config
       run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
@@ -68,21 +65,8 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}        
         IMAGE_TAG: ${{ steps.commit.outputs.short }}
       run: |
-        sed -i 's|image: streamlit:.*|image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_FRONTEND }}:${{ env.IMAGE_TAG }}|' manifests/streamlit.yaml
         sed -i 's|image: server:.*|image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_SERVER }}:${{ env.IMAGE_TAG }}|' manifests/chatbot.yaml
-        kubectl apply -f manifests/streamlit.yaml
         kubectl apply -f manifests/chatbot.yaml
-
-    - name: Check deployment status for Streamlit
-      run: |
-        kubectl rollout status deployment/streamlit -n default
-        STATUS=$?
-        if [ $STATUS -ne 0 ]; then
-          echo "Streamlit Deployment failed"
-          exit 1
-        else
-          echo "Streamlit Deployment successful"
-        fi
 
     - name: Check deployment status for Chatbot
       run: |

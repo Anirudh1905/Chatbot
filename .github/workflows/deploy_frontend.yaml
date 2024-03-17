@@ -1,0 +1,80 @@
+name: Deploy Frontend to EKS
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/frontend.py'
+
+env:
+  ECR_REPOSITORY_FRONTEND: chatbot-repo/streamlit
+  EKS_CLUSTER_NAME: chatbot-cluster
+  AWS_REGION: us-east-1
+
+jobs:
+  build:
+    name: Deployment
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set short git commit SHA
+      id: commit
+      uses: prompt/actions-commit-hash@v2
+
+    - name: Check out code
+      uses: actions/checkout@v3
+
+    - name: Install kubectl
+      uses: azure/setup-kubectl@v2.0
+      id: install
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Cache Docker layers
+      uses: actions/cache@v3
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ hashFiles('**/Dockerfile-frontend', '**/Dockerfile-server') }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+
+    - name: Build, tag, and push image to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}   
+        IMAGE_TAG: ${{ steps.commit.outputs.short }}
+      run: |
+        docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_FRONTEND }}:${{ env.IMAGE_TAG }} -f Dockerfile-frontend . --cache-from=type=local,src=/tmp/.buildx-cache
+        docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_FRONTEND }}:${{ env.IMAGE_TAG }}
+        docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_FRONTEND }}:${{ env.IMAGE_TAG }} ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_FRONTEND }}:latest
+        
+    - name: Update kube config
+      run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+
+    - name: Deploy to EKS
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}        
+        IMAGE_TAG: ${{ steps.commit.outputs.short }}
+      run: |
+        sed -i 's|image: streamlit:.*|image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_FRONTEND }}:${{ env.IMAGE_TAG }}|' manifests/streamlit.yaml
+        kubectl apply -f manifests/streamlit.yaml
+
+    - name: Check deployment status for Streamlit
+      run: |
+        kubectl rollout status deployment/streamlit -n default
+        STATUS=$?
+        if [ $STATUS -ne 0 ]; then
+          echo "Streamlit Deployment failed"
+          exit 1
+        else
+          echo "Streamlit Deployment successful"
+        fi
