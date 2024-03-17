@@ -56,6 +56,7 @@ jobs:
         docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_SERVER }}:${{ env.IMAGE_TAG }} -f Dockerfile-server . --cache-from=type=local,src=/tmp/.buildx-cache
         docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_SERVER }}:${{ env.IMAGE_TAG }}
         docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_SERVER }}:${{ env.IMAGE_TAG }} ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_SERVER }}:latest
+        docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY_SERVER }}:latest
 
     - name: Update kube config
       run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
