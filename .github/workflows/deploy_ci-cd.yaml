@@ -3,8 +3,8 @@ name: Deploy to EKS
 on:
   push:
     branches: [ main ]
-    paths:
-      - 'src/**'
+    # paths:
+    #   - 'src/**'
 
 env:
   ECR_REPOSITORY_FRONTEND: chatbot-repo/streamlit
