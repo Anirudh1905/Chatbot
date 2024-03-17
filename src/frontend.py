@@ -2,7 +2,7 @@ import requests
 import streamlit as st
 
 
-st.title("Sentence completion bot")
+st.title("Chatbot")
 
 # Initialize chat history
 if "messages" not in st.session_state:
