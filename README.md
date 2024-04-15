@@ -6,6 +6,10 @@ Designed and deployed a simple chatbot utilizing Large Language Models (LLMs) on
 
 ![Frontend](Designs/Frontend.png)
 
+## Model Level Design
+
+![Model Level Design](Designs/model_design.png)
+
 ## Low Level Design
 
 ![LLD](Designs/LLD.png)
